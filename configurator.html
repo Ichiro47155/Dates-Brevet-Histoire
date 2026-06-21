@@ -1,1152 +1,133 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brevet Chrono — Configurateur</title>
+    <title>Page déplacée</title>
     <style>
-        :root[data-theme="light"] {
-            --bg-color: #f6f5f4;
-            --card-bg: #ffffff;
-            --text-color: #2e3436;
-            --text-muted: #6e7273;
-            --border-color: #e1dedb;
-            --accent-color: #813d9c; /* Adwaita Purple Light */
-            --accent-hover: #69307f;
-            --accent-text: #ffffff;
-            --delete-color: #c01c28;
-            --delete-bg: #fbebeb;
-            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        :root[data-theme="dark"] {
-            --bg-color: #1e1e1e;
-            --card-bg: #2d2d2d;
-            --text-color: #f6f5f4;
-            --text-muted: #9a9996;
-            --border-color: #3d3d3d;
-            --accent-color: #c061cb; /* Adwaita Purple Dark */
-            --accent-hover: #d27cd9;
-            --accent-text: #1e1e1e;
-            --delete-color: #ff7b63;
-            --delete-bg: #441a1a;
-            --shadow: 0 2px 8px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.15);
-        }
-
-        * {
-            box-sizing: border-box;
-            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        /* Palette Adwaita Sombre (Dark) & Accent Purple */
+        :root {
+            --window-bg-color: #242424;
+            --view-bg-color: #1e1e1e;
+            --text-color: #ffffff;
+            --text-secondary-color: #9a9996;
+            
+            /* GNOME Purple Palette */
+            --accent-purple: #7852ee;
+            --accent-purple-hover: #916ff4;
+            --accent-purple-active: #613cbc;
+            
+            --button-bg: #303030;
+            --button-hover-bg: #383838;
+            --button-active-bg: #282828;
+            --border-color: rgba(255, 255, 255, 0.15);
         }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            background-color: var(--window-bg-color);
+            color: var(--text-color);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            box-sizing: border-box;
         }
 
-        /* Barre supérieure stable */
-        .app-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 24px;
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 10;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .logo-svg {
-            width: 28px;
-            height: 28px;
-            fill: var(--accent-color);
-        }
-
-        .view-container {
-            flex-grow: 1;
-            padding: 24px;
-            max-width: 1200px;
+        /* Conteneur de style "Card" ou vue GNOME */
+        .status-page {
+            text-align: center;
+            max-width: 500px;
             width: 100%;
-            margin: 0 auto;
-        }
-
-        .config-layout {
-            display: grid;
-            grid-template-columns: 340px 1fr;
-            gap: 24px;
-        }
-
-        @media (max-width: 900px) {
-            .config-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background-color: var(--card-bg);
+            padding: 40px 24px;
+            background-color: var(--view-bg-color);
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            padding: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
         }
 
-        h2 {
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
             margin-top: 0;
-            font-size: 1.3rem;
-            font-weight: 700;
+            margin-bottom: 32px;
+            letter-spacing: -0.2px;
         }
 
-        .form-group {
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        select, input, textarea {
-            width: 100%;
-            font-family: inherit;
-            font-size: 0.9rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            outline: none;
-        }
-
-        select:focus, input:focus, textarea:focus {
-            border-color: var(--accent-color);
-        }
-
-        .btn {
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        /* Bouton principal avec l'accent Purple d'Adwaita */
+        .btn-accent {
+            display: inline-block;
+            background-color: var(--accent-purple);
+            color: #ffffff;
             text-decoration: none;
-            height: 38px;
-        }
-
-        .btn:hover {
-            background-color: var(--border-color);
-        }
-
-        .btn.primary {
-            background-color: var(--accent-color);
-            color: var(--accent-text);
-            border: none;
-        }
-
-        .btn.primary:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .btn.danger {
-            background-color: transparent;
-            color: var(--delete-color);
-            border-color: var(--delete-color);
-        }
-
-        .btn.danger:hover {
-            background-color: var(--delete-bg);
-        }
-
-        /* Affichage de sélection de chapitre */
-        .selector-display-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
+            padding: 10px 24px;
+            font-size: 15px;
+            font-weight: 600;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-color);
-            min-height: 42px;
+            transition: background-color 150ms ease;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
         }
 
-        .selector-display-text {
-            font-size: 0.9rem;
-            font-weight: 500;
+        .btn-accent:hover {
+            background-color: var(--accent-purple-hover);
         }
 
-        /* Barre de recherche */
-        .search-container {
-            display: flex;
-            position: relative;
-            margin-bottom: 16px;
-            width: 100%;
+        .btn-accent:active {
+            background-color: var(--accent-purple-active);
         }
 
-        .search-container input {
-            padding-left: 40px;
+        /* Section lien brut en dessous */
+        .link-container {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            fill: var(--text-muted);
+        .destination-link {
+            font-size: 13px;
+            color: var(--text-secondary-color);
+            text-decoration: none;
+            word-break: break-all;
+            font-family: monospace;
+            transition: color 150ms ease;
         }
 
-        /* Tableau */
-        .table-scroller {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow-x: auto;
-            box-shadow: var(--shadow);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background-color: var(--bg-color);
-            padding: 12px 16px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            vertical-align: middle;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .badge {
-            background-color: var(--border-color);
-            color: var(--text-color);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .badge.accent {
-            background-color: var(--accent-color);
-            color: var(--accent-text);
-        }
-
-        .table-actions {
-            display: flex;
-            gap: 6px;
-            justify-content: flex-end;
-        }
-
-        /* En-tête de navigation aligné */
-        .nav-tabs {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .action-icon-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .action-icon-btn:hover {
-            background-color: var(--border-color);
-        }
-
-        .action-icon-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-        }
-
-        .sync-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        /* Modales */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 16px;
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 540px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* Structure en Arbre (Tree View) */
-        .tree-container {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 350px;
-            overflow-y: auto;
-        }
-
-        .tree-theme-node {
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding-bottom: 8px;
-        }
-        .tree-theme-node:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .tree-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 8px;
-            border-radius: 6px;
-        }
-
-        .theme-row {
-            background-color: rgba(0, 0, 0, 0.03);
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-
-        .chapter-row {
-            margin-left: 20px;
-            font-weight: 500;
-            font-size: 0.85rem;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            margin-top: 4px;
-        }
-
-        .chapter-row.selectable {
-            cursor: pointer;
-        }
-        .chapter-row.selectable:hover {
-            border-color: var(--accent-color);
-            background-color: rgba(129, 61, 156, 0.05);
-        }
-
-        .tree-node-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .tree-mini-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            width: 26px;
-            height: 26px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-        }
-        .tree-mini-btn:hover {
-            background-color: var(--border-color);
-        }
-        .tree-mini-btn.danger-hover:hover {
-            background-color: var(--delete-bg);
-            color: var(--delete-color);
-            border-color: transparent;
-        }
-        .tree-mini-btn svg {
-            width: 14px;
-            height: 14px;
-            fill: currentColor;
-        }
-
-        /* Notifications Toast */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transform: translateY(150%);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 110;
-            font-weight: 500;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-        }
-
-        .hidden {
-            display: none !important;
+        .destination-link:hover {
+            color: var(--accent-purple-hover);
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <!-- BARRE D'APPLICATION -->
-    <div class="app-bar">
-        <div class="logo-area">
-            <svg class="logo-svg" viewBox="0 0 24 24">
-                <path d="M12 2C11.45 2 11 2.45 11 3V7.16C9.37 7.64 8 9.13 8 11C8 12.08 8.44 13.07 9.14 13.8L12 16.66L14.86 13.8C15.56 13.07 16 12.08 16 11C16 9.13 14.63 7.64 13 7.16V3C13 2.45 12.55 2 12 2M12 9C13.1 9 14 9.9 14 11C14 11.55 13.78 12.05 13.41 12.41L12 13.83L10.59 12.41C10.22 12.05 10 11.55 10 11C10 9.9 10.9 9 12 9M11 18.5V21C11 21.55 11.45 22 12 22C12.55 22 13 21.55 13 21V18.5C14.63 18.02 16 16.53 16 14.66C16 14.28 15.93 13.9 15.81 13.55L12 17.36L8.19 13.55C8.07 13.9 8 14.28 8 14.66C8 16.53 9.37 18.02 11 18.5Z" />
-            </svg>
-            <span>Brevet Chrono — Config</span>
-        </div>
-
-        <div class="nav-tabs">
-            <a href="index.html" class="btn" style="padding: 0 16px; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center;">
-                <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24">
-                    <path d="M2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12M10,17L15,12L10,7V17Z" />
-                </svg>
-                Réviser
-            </a>
-            <button class="btn" id="btn-open-settings" style="font-size: 0.85rem;">
-                <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24">
-                    <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.47,5.34 14.86,5.08L14.47,2.42C14.43,2.18 14.22,2 14,2H10C9.78,2 9.57,2.18 9.53,2.42L9.14,5.08C8.53,5.34 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.53,18.66 9.14,18.92L9.53,21.58C9.57,21.82 9.78,22 10,22H14C14.22,22 14.43,21.82 14.47,21.58L14.86,18.92C15.47,18.66 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
-                </svg>
-                Paramètres
-            </button>
-            <button class="action-icon-btn" id="theme-toggle" title="Changer de thème">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 2A10 10 0 0 0 2 12A10 10 0 0 0 12 22A10 10 0 0 0 22 12A10 10 0 0 0 12 2M12 4A8 8 0 0 1 20 12A8 8 0 0 1 12 20V4Z" />
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    <!-- CONTENEUR PRINCIPAL -->
-    <div class="view-container">
+    <div class="status-page">
+        <h1>Oups, cette page à été déplacée</h1>
         
-        <div class="config-layout">
-            
-            <!-- FORMULAIRE (PANNEAU GAUCHE) -->
-            <div class="card" style="height: fit-content;">
-                <h2 id="editor-title">Ajouter une fiche</h2>
-                <form id="editor-form" style="display: flex; flex-direction: column; gap: 4px;">
-                    <input type="hidden" id="edit-id" value="-1">
-                    
-                    <div class="form-group">
-                        <label for="input-date">Date (Texte)*</label>
-                        <input type="text" id="input-date" placeholder="Ex: 18 juin 1940 ou 1914-1918" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="input-format">Format requis*</label>
-                        <select id="input-format" required>
-                            <option value="Année">Année</option>
-                            <option value="Mois Année">Mois Année</option>
-                            <option value="Jour Mois Année">Jour Mois Année</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="input-level">Niveau (0 à 255)*</label>
-                        <input type="number" id="input-level" min="0" max="255" value="0" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="input-event">Événement*</label>
-                        <textarea id="input-event" rows="2" placeholder="Description courte..." required></textarea>
-                    </div>
-
-                    <!-- SELECTIONNEUR DU CHAPITRE (PAS DE TEXTE A SAISIR) -->
-                    <div class="form-group">
-                        <label>Chapitre & Thème rattachés*</label>
-                        <div class="selector-display-box" id="selector-display">
-                            <span class="selector-display-text" id="display-selected-text" style="color: var(--text-muted);">Aucun chapitre sélectionné</span>
-                            <button type="button" class="btn" id="btn-open-selector" style="height: 30px; padding: 0 10px; font-size: 0.75rem;">Choisir...</button>
-                        </div>
-                        <!-- Chaines sauvegardées pour la compatibilité avec l'index de révision -->
-                        <input type="hidden" id="input-theme" required>
-                        <input type="hidden" id="input-chapter" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="input-explanation">Explication détaillée (Optionnel)</label>
-                        <textarea id="input-explanation" rows="3" placeholder="Informations complémentaires..."></textarea>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button type="button" class="btn hidden" id="btn-cancel-edit">Annuler</button>
-                        <button type="submit" class="btn primary" id="btn-save" style="flex: 1;">Ajouter</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- TABLEAU DES DATES & RECHERCHE (PANNEAU DROIT) -->
-            <div>
-                <!-- Outils de sauvegarde -->
-                <div class="sync-row">
-                    <button class="btn" id="btn-load-server">
-                        <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24">
-                            <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H21V3L17.65,6.35Z" />
-                        </svg>
-                        Restaurer de dates.json
-                    </button>
-                    <button class="btn" id="btn-export-json" style="background-color: var(--accent-color); color: var(--accent-text); border: none;">
-                        <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24">
-                            <path d="M5,20H19V18H5V20M19,9H15V3H9V9H5L12,16L19,9Z" />
-                        </svg>
-                        Télécharger dates.json
-                    </button>
-                </div>
-
-                <!-- Barre de recherche -->
-                <div class="search-container">
-                    <svg class="search-icon" viewBox="0 0 24 24">
-                        <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L22,21.27L20.73,22.54L13.14,15C11.96,15.79 10.55,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
-                    </svg>
-                    <input type="text" id="table-search" placeholder="Rechercher par date, événement, thème...">
-                </div>
-
-                <!-- Tableau -->
-                <div class="table-scroller">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 80px;">Niveau</th>
-                                <th>Date</th>
-                                <th>Événement</th>
-                                <th>Thème & Chapitre</th>
-                                <th style="width: 100px; text-align: right;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="config-table-body">
-                            <!-- Rempli dynamiquement -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+        <a id="redirect-btn" href="#" class="btn-accent">Aller à la nouvelle adresse</a>
+        
+        <div class="link-container">
+            <a id="redirect-text-link" href="#" class="destination-link"></a>
         </div>
-
-    </div>
-
-    <!-- MODAL 1 : SELECTION DU CHAPITRE -->
-    <div class="modal hidden" id="selector-modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
-                <h3 style="margin: 0;">Sélectionner un chapitre</h3>
-                <button class="action-icon-btn" id="btn-close-selector" type="button" style="width: 32px; height: 32px;">
-                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
-                </button>
-            </div>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Cliquez sur un chapitre pour le lier à la fiche de révision.</p>
-            <div class="tree-container" id="selection-tree-container">
-                <!-- Arbre de sélection généré dynamiquement -->
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2 : GESTION DES CATEGORIES ET ARBRE DE PARAMETRES -->
-    <div class="modal hidden" id="settings-modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
-                <h3 style="margin: 0;">Gestion des catégories</h3>
-                <button class="action-icon-btn" id="btn-close-settings" title="Fermer" type="button" style="width: 32px; height: 32px;">
-                    <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
-                </button>
-            </div>
-
-            <!-- Ajouter un thème global -->
-            <div style="background-color: var(--bg-color); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <h4 style="margin: 0 0 8px 0; font-size: 0.85rem;">Nouveau thème global</h4>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="setting-new-theme" placeholder="Ex: Histoire, Géographie..." style="flex: 1; height: 36px; padding: 6px 12px;">
-                    <button type="button" class="btn primary" id="btn-add-theme" style="height: 36px;">Ajouter</button>
-                </div>
-            </div>
-
-            <!-- Vue en arbre interactive (Avec bouton de tri Monter/Descendre) -->
-            <h4 style="margin: 8px 0 0 0; font-size: 0.85rem;">Arborescence interactive & Ordre chronologique</h4>
-            <div class="tree-container" id="settings-tree-container" style="max-height: 280px;">
-                <!-- Arbre de tri de paramètres généré ici -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Toast -->
-    <div class="toast" id="toast-notif">
-        <svg id="toast-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: var(--accent-color);"></svg>
-        <span id="toast-text">Message</span>
     </div>
 
     <script>
-        const CONFIG_JSON_URL = "https://ichiro47155.github.io/Dates-Brevet-Histoire/dates.json";
-        
-        let datesDataset = [];
-        let configSettings = {
-            themes: [],   // Format: { id: "t1", name: "Histoire" }
-            chapters: []  // Format: { id: "c1", themeId: "t1", name: "La Première Guerre mondiale" }
-        };
+        // CONFIGURATION DE L'URL
+        const CONFIG_REDIRECT_URL = "https://ichiro47155.github.io/Brevet-Reviser/configurator.html";
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
+        // Injection de la variable dans le DOM
+        document.addEventListener("DOMContentLoaded", () => {
+            const button = document.getElementById("redirect-btn");
+            const textLink = document.getElementById("redirect-text-link");
 
-            document.getElementById('theme-toggle').addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
-            });
-
-            setupSelectorModal();
-            setupSettingsModal();
-            await loadDataset();
-        });
-
-        // --- CHARGEMENT DU JSON ET BACKUP LOCAL ---
-        async function loadDataset() {
-            const stored = localStorage.getItem('brevet_dates_db');
-            if(stored) {
-                parseDatabase(JSON.parse(stored));
-                renderConfigTable();
-                return;
-            }
-
-            try {
-                const response = await fetch(CONFIG_JSON_URL);
-                if (response.ok) {
-                    const raw = await response.json();
-                    parseDatabase(raw);
-                    saveToLocalStorage();
-                    renderConfigTable();
-                    showToast("Dates et paramètres chargés", "info");
-                }
-            } catch (error) {
-                datesDataset = [];
-                renderConfigTable();
-                showToast("Prêt à configurer vos premières fiches.", "info");
-            }
-        }
-
-        // Rétrocompatibilité et structuration de la BD
-        function parseDatabase(parsed) {
-            if (Array.isArray(parsed)) {
-                datesDataset = parsed;
-                configSettings = { themes: [], chapters: [] };
-            } else {
-                datesDataset = parsed.dates || [];
-                configSettings = parsed.settings || { themes: [], chapters: [] };
-            }
-
-            // Génération automatique des catégories à partir des fiches existantes si vides
-            if(configSettings.themes.length === 0 && datesDataset.length > 0) {
-                const uniqueThemes = [...new Set(datesDataset.map(d => d.theme).filter(Boolean))];
-                uniqueThemes.forEach((tName, tIdx) => {
-                    const tId = 't_' + tIdx + '_' + Date.now();
-                    configSettings.themes.push({ id: tId, name: tName });
-                    
-                    const uniqueChaps = [...new Set(datesDataset.filter(d => d.theme === tName).map(d => d.chapter).filter(Boolean))];
-                    uniqueChaps.forEach((cName, cIdx) => {
-                        configSettings.chapters.push({ id: 'c_' + tIdx + '_' + cIdx + '_' + Date.now(), themeId: tId, name: cName });
-                    });
-                });
-            }
-        }
-
-        function saveToLocalStorage() {
-            const out = {
-                settings: configSettings,
-                dates: datesDataset
-            };
-            localStorage.setItem('brevet_dates_db', JSON.stringify(out));
-        }
-
-        // --- TABLEAU DE GESTION DES FICHES ---
-        function renderConfigTable(filterText = "") {
-            const tbody = document.getElementById('config-table-body');
-            tbody.innerHTML = '';
-
-            const filtered = datesDataset.filter(item => {
-                const searchString = `${item.date} ${item.event} ${item.theme || ''} ${item.chapter || ''}`.toLowerCase();
-                return searchString.includes(filterText.toLowerCase());
-            });
-
-            if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Aucune fiche trouvée.</td></tr>`;
-                return;
-            }
-
-            filtered.forEach((item, index) => {
-                const globalIndex = datesDataset.indexOf(item);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><span class="badge ${item.level === 0 ? 'accent' : ''}">${item.level}</span></td>
-                    <td><strong>${item.date}</strong><br><small style="color: var(--text-muted);">${item.dateFormat}</small></td>
-                    <td><strong>${item.event}</strong></td>
-                    <td><small><strong>${item.theme || '-'}</strong> <br><span style="color: var(--text-muted);">${item.chapter || '-'}</span></small></td>
-                    <td>
-                        <div class="table-actions">
-                            <button class="action-icon-btn" onclick="triggerEdit(${globalIndex})" title="Modifier">
-                                <svg viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.07,6.19L3,17.25Z"/></svg>
-                            </button>
-                            <button class="action-icon-btn delete" onclick="triggerDelete(${globalIndex})" title="Supprimer">
-                                <svg viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        document.getElementById('table-search').addEventListener('input', (e) => {
-            renderConfigTable(e.target.value);
-        });
-
-        // --- ENREGISTREMENT SANS RÉINITIALISER LES SÉLECTIONS ---
-        document.getElementById('editor-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const editId = parseInt(document.getElementById('edit-id').value);
-            const themeSelected = document.getElementById('input-theme').value;
-            const chapterSelected = document.getElementById('input-chapter').value;
-
-            if(!themeSelected || !chapterSelected) {
-                showToast("Veuillez sélectionner un chapitre rattaché.", "warning");
-                return;
-            }
-
-            const entry = {
-                level: parseInt(document.getElementById('input-level').value),
-                date: document.getElementById('input-date').value.trim(),
-                dateFormat: document.getElementById('input-format').value,
-                event: document.getElementById('input-event').value.trim(),
-                theme: themeSelected,
-                chapter: chapterSelected,
-                explanation: document.getElementById('input-explanation').value.trim() || undefined
-            };
-
-            if(editId === -1) {
-                datesDataset.push(entry);
-                showToast("Fiche créée", "info");
-            } else {
-                datesDataset[editId] = entry;
-                showToast("Fiche modifiée", "info");
-            }
-
-            saveToLocalStorage();
-            
-            // On réinitialise les détails SAUF le thème et le chapitre pour enchaîner
-            document.getElementById('input-date').value = '';
-            document.getElementById('input-event').value = '';
-            document.getElementById('input-explanation').value = '';
-            document.getElementById('input-level').value = '0';
-            
-            resetEditorStateOnly();
-            renderConfigTable();
-        });
-
-        window.triggerEdit = function(index) {
-            const item = datesDataset[index];
-            document.getElementById('edit-id').value = index;
-            document.getElementById('input-level').value = item.level;
-            document.getElementById('input-date').value = item.date;
-            document.getElementById('input-format').value = item.dateFormat;
-            document.getElementById('input-event').value = item.event;
-            document.getElementById('input-theme').value = item.theme || '';
-            document.getElementById('input-chapter').value = item.chapter || '';
-            document.getElementById('input-explanation').value = item.explanation || '';
-
-            // Met à jour la sélection de chapitre
-            if(item.chapter && item.theme) {
-                document.getElementById('display-selected-text').textContent = `${item.chapter} (Thème: ${item.theme})`;
-                document.getElementById('display-selected-text').style.color = "var(--text-color)";
-            } else {
-                document.getElementById('display-selected-text').textContent = "Aucun chapitre sélectionné";
-                document.getElementById('display-selected-text').style.color = "var(--text-muted)";
-            }
-
-            document.getElementById('editor-title').textContent = "Modifier la fiche";
-            document.getElementById('btn-cancel-edit').classList.remove('hidden');
-            document.getElementById('btn-save').textContent = "Enregistrer";
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.triggerDelete = function(index) {
-            if(confirm("Supprimer cette fiche ?")) {
-                datesDataset.splice(index, 1);
-                saveToLocalStorage();
-                renderConfigTable();
-                showToast("Fiche supprimée", "warning");
-            }
-        };
-
-        document.getElementById('btn-cancel-edit').addEventListener('click', () => {
-            document.getElementById('editor-form').reset();
-            
-            // Remet à zéro la sélection
-            document.getElementById('input-theme').value = '';
-            document.getElementById('input-chapter').value = '';
-            document.getElementById('display-selected-text').textContent = "Aucun chapitre sélectionné";
-            document.getElementById('display-selected-text').style.color = "var(--text-muted)";
-
-            resetEditorStateOnly();
-        });
-
-        function resetEditorStateOnly() {
-            document.getElementById('edit-id').value = "-1";
-            document.getElementById('editor-title').textContent = "Ajouter une fiche";
-            document.getElementById('btn-save').textContent = "Ajouter";
-            document.getElementById('btn-cancel-edit').classList.add('hidden');
-        }
-
-        // Téléchargements et rechargements serveurs
-        document.getElementById('btn-export-json').addEventListener('click', () => {
-            const out = { settings: configSettings, dates: datesDataset };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(out, null, 2));
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", "dates.json");
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
-            showToast("Exportation prête !", "info");
-        });
-
-        document.getElementById('btn-load-server').addEventListener('click', async () => {
-            if(confirm("Écraser les modifications locales ?")) {
-                localStorage.removeItem('brevet_dates_db');
-                await loadDataset();
-                renderConfigTable();
+            if (button && textLink) {
+                button.href = CONFIG_REDIRECT_URL;
+                textLink.href = CONFIG_REDIRECT_URL;
+                textLink.textContent = CONFIG_REDIRECT_URL;
             }
         });
-
-
-        // ================= MODAL 1 : SÉLECTIONNEUR DE CHAPITRE (ARBRE) =================
-        function setupSelectorModal() {
-            const modal = document.getElementById('selector-modal');
-            
-            document.getElementById('btn-open-selector').addEventListener('click', () => {
-                renderSelectionTree();
-                modal.classList.remove('hidden');
-            });
-
-            document.getElementById('btn-close-selector').addEventListener('click', () => {
-                modal.classList.add('hidden');
-            });
-        }
-
-        function renderSelectionTree() {
-            const container = document.getElementById('selection-tree-container');
-            container.innerHTML = '';
-
-            if(configSettings.themes.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:12px; font-size:0.9rem; color:var(--text-muted);">Aucun thème créé. Allez dans les "Paramètres" en haut à droite pour créer vos thèmes et chapitres.</div>`;
-                return;
-            }
-
-            configSettings.themes.forEach((theme) => {
-                const themeNode = document.createElement('div');
-                themeNode.className = "tree-theme-node";
-                
-                // Entête du Thème
-                const themeRow = document.createElement('div');
-                themeRow.className = "tree-row theme-row";
-                themeRow.innerHTML = `<span>${theme.name}</span>`;
-                themeNode.appendChild(themeRow);
-
-                // Chapitres rattachés
-                const siblingChapters = configSettings.chapters.filter(c => c.themeId === theme.id);
-                if(siblingChapters.length === 0) {
-                    const noChap = document.createElement('div');
-                    noChap.className = "tree-row";
-                    noChap.style.marginLeft = "20px";
-                    noChap.style.fontSize = "0.8rem";
-                    noChap.style.color = "var(--text-muted)";
-                    noChap.textContent = "Aucun chapitre dans ce thème.";
-                    themeNode.appendChild(noChap);
-                } else {
-                    siblingChapters.forEach((chapter) => {
-                        const chapterRow = document.createElement('div');
-                        chapterRow.className = "tree-row chapter-row selectable";
-                        chapterRow.innerHTML = `<span>${chapter.name}</span>`;
-                        
-                        // Clic pour sélectionner sans écrire !
-                        chapterRow.addEventListener('click', () => {
-                            document.getElementById('input-theme').value = theme.name;
-                            document.getElementById('input-chapter').value = chapter.name;
-                            
-                            const display = document.getElementById('display-selected-text');
-                            display.textContent = `${chapter.name} (Thème: ${theme.name})`;
-                            display.style.color = "var(--text-color)";
-
-                            document.getElementById('selector-modal').classList.add('hidden');
-                            showToast("Chapitre sélectionné !", "info");
-                        });
-                        themeNode.appendChild(chapterRow);
-                    });
-                }
-
-                container.appendChild(themeNode);
-            });
-        }
-
-
-        // ================= MODAL 2 : CONFIGURATION & ÉVOLUTION DE L'ARBRE (SETTINGS) =================
-        function setupSettingsModal() {
-            const modal = document.getElementById('settings-modal');
-            
-            document.getElementById('btn-open-settings').addEventListener('click', () => {
-                modal.classList.remove('hidden');
-                renderSettingsTree();
-            });
-
-            document.getElementById('btn-close-settings').addEventListener('click', () => {
-                modal.classList.add('hidden');
-            });
-
-            // Ajouter Thème global
-            document.getElementById('btn-add-theme').addEventListener('click', () => {
-                const input = document.getElementById('setting-new-theme');
-                const name = input.value.trim();
-                if(!name) return;
-
-                const id = 't_' + Date.now();
-                configSettings.themes.push({ id, name });
-                input.value = '';
-                saveToLocalStorage();
-                renderSettingsTree();
-                showToast("Thème créé", "info");
-            });
-        }
-
-        // Rendu de l'arbre d'indexation dans les paramètres
-        function renderSettingsTree() {
-            const container = document.getElementById('settings-tree-container');
-            container.innerHTML = '';
-
-            if(configSettings.themes.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:12px; font-size:0.9rem; color:var(--text-muted);">Aucun thème créé. Saisissez-en un ci-dessus pour démarrer.</div>`;
-                return;
-            }
-
-            configSettings.themes.forEach((theme, tIdx) => {
-                const themeNode = document.createElement('div');
-                themeNode.className = "tree-theme-node";
-
-                // Ligne du Thème (Triable & Supprimable)
-                const themeRow = document.createElement('div');
-                themeRow.className = "tree-row theme-row";
-                themeRow.innerHTML = `
-                    <span>${theme.name}</span>
-                    <div class="tree-node-actions">
-                        <button class="tree-mini-btn" onclick="moveTheme('${theme.id}', 'up')" title="Monter">
-                            <svg viewBox="0 0 24 24"><path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/></svg>
-                        </button>
-                        <button class="tree-mini-btn" onclick="moveTheme('${theme.id}', 'down')" title="Descendre">
-                            <svg viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
-                        </button>
-                        <button class="tree-mini-btn" onclick="addChapterInline('${theme.id}')" title="Ajouter un chapitre" style="color:var(--accent-color);">
-                            <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
-                        </button>
-                        <button class="tree-mini-btn danger-hover" onclick="deleteTheme('${theme.id}')" title="Supprimer">
-                            <svg viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
-                        </button>
-                    </div>
-                `;
-                themeNode.appendChild(themeRow);
-
-                // Récupération des chapitres liés
-                const siblingChapters = configSettings.chapters.filter(c => c.themeId === theme.id);
-                if(siblingChapters.length > 0) {
-                    siblingChapters.forEach((chapter, cIdx) => {
-                        const chapterRow = document.createElement('div');
-                        chapterRow.className = "tree-row chapter-row";
-                        chapterRow.innerHTML = `
-                            <span>${chapter.name}</span>
-                            <div class="tree-node-actions">
-                                <button class="tree-mini-btn" onclick="moveChapter('${chapter.id}', 'up')" title="Monter">
-                                    <svg viewBox="0 0 24 24"><path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/></svg>
-                                </button>
-                                <button class="tree-mini-btn" onclick="moveChapter('${chapter.id}', 'down')" title="Descendre">
-                                    <svg viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
-                                </button>
-                                <button class="tree-mini-btn danger-hover" onclick="deleteChapter('${chapter.id}')" title="Supprimer">
-                                    <svg viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
-                                </button>
-                            </div>
-                        `;
-                        themeNode.appendChild(chapterRow);
-                    });
-                }
-
-                container.appendChild(themeNode);
-            });
-        }
-
-        // --- MANIPULATIONS CHRONOLOGIQUES DE L'ARBRE (TRI) ---
-
-        window.moveTheme = function(themeId, direction) {
-            const index = configSettings.themes.findIndex(t => t.id === themeId);
-            if(index === -1) return;
-
-            if(direction === 'up' && index > 0) {
-                const temp = configSettings.themes[index];
-                configSettings.themes[index] = configSettings.themes[index - 1];
-                configSettings.themes[index - 1] = temp;
-            } else if (direction === 'down' && index < configSettings.themes.length - 1) {
-                const temp = configSettings.themes[index];
-                configSettings.themes[index] = configSettings.themes[index + 1];
-                configSettings.themes[index + 1] = temp;
-            }
-
-            saveToLocalStorage();
-            renderSettingsTree();
-        };
-
-        window.moveChapter = function(chapterId, direction) {
-            const targetChap = configSettings.chapters.find(c => c.id === chapterId);
-            if(!targetChap) return;
-
-            // Filtre les chapitres du même thème pour effectuer le décalage relatif
-            const siblingChapters = configSettings.chapters.filter(c => c.themeId === targetChap.themeId);
-            const indexInSiblings = siblingChapters.findIndex(c => c.id === chapterId);
-
-            if(direction === 'up' && indexInSiblings > 0) {
-                const swapTarget = siblingChapters[indexInSiblings - 1];
-                swapChaptersGlobally(targetChap.id, swapTarget.id);
-            } else if (direction === 'down' && indexInSiblings < siblingChapters.length - 1) {
-                const swapTarget = siblingChapters[indexInSiblings + 1];
-                swapChaptersGlobally(targetChap.id, swapTarget.id);
-            }
-        };
-
-        function swapChaptersGlobally(id1, id2) {
-            const idx1 = configSettings.chapters.findIndex(c => c.id === id1);
-            const idx2 = configSettings.chapters.findIndex(c => c.id === id2);
-            
-            const temp = configSettings.chapters[idx1];
-            configSettings.chapters[idx1] = configSettings.chapters[idx2];
-            configSettings.chapters[idx2] = temp;
-
-            saveToLocalStorage();
-            renderSettingsTree();
-        }
-
-        // --- GESTION DES COCHAGES & AJOUTS EN LIGNE ---
-
-        window.addChapterInline = function(themeId) {
-            const name = prompt("Saisissez le nom du nouveau chapitre :");
-            if(!name || !name.trim()) return;
-
-            const id = 'c_' + Date.now();
-            configSettings.chapters.push({ id, themeId, name: name.trim() });
-            
-            saveToLocalStorage();
-            renderSettingsTree();
-            showToast("Chapitre ajouté", "info");
-        };
-
-        window.deleteTheme = function(themeId) {
-            if(confirm("Supprimer ce thème supprimera également tous ses chapitres. Continuer ?")) {
-                configSettings.themes = configSettings.themes.filter(t => t.id !== themeId);
-                configSettings.chapters = configSettings.chapters.filter(c => c.themeId !== themeId);
-                saveToLocalStorage();
-                renderSettingsTree();
-                showToast("Thème supprimé", "warning");
-            }
-        };
-
-        window.deleteChapter = function(chapterId) {
-            if(confirm("Supprimer ce chapitre ?")) {
-                configSettings.chapters = configSettings.chapters.filter(c => c.id !== chapterId);
-                saveToLocalStorage();
-                renderSettingsTree();
-                showToast("Chapitre supprimé", "warning");
-            }
-        };
-
-        // --- TOASTS DE NOTIFICATIONS ---
-        function showToast(text, type = "info") {
-            const toast = document.getElementById('toast-notif');
-            const icon = document.getElementById('toast-icon');
-            const textEl = document.getElementById('toast-text');
-
-            textEl.textContent = text;
-            
-            if(type === 'warning') {
-                icon.style.fill = 'var(--delete-color)';
-                icon.innerHTML = `<path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>`;
-            } else {
-                icon.style.fill = 'var(--accent-color)';
-                icon.innerHTML = `<path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/>`;
-            }
-
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
-        }
     </script>
 </body>
 </html>
